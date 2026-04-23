@@ -1,8 +1,19 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
 
 export default function Navbar() {
+  const { user, signOut } = useAuth()
+  const router = useRouter()
+
+  const handleSignOut = async () => {
+    await signOut()
+    router.push('/')
+    router.refresh()
+  }
+
   return (
     <>
       {/* Desktop Nav */}
@@ -35,6 +46,7 @@ export default function Navbar() {
               </li>
             </ul>
           </div>
+
           <div className="flex items-center gap-6 text-[#0051d5]">
             <div className="relative hidden lg:block">
               <input
@@ -47,9 +59,28 @@ export default function Navbar() {
             <Link href="/cart" className="hover:opacity-80 transition-opacity">
               <span className="material-symbols-outlined">shopping_bag</span>
             </Link>
-            <button className="hover:opacity-80 transition-opacity">
-              <span className="material-symbols-outlined">person</span>
-            </button>
+
+            {user ? (
+              <div className="flex items-center gap-3">
+                <Link href="/admin" className="text-[11px] font-semibold tracking-widest uppercase text-[#45464d] hover:text-black transition-colors">
+                  Admin
+                </Link>
+                <div className="w-px h-4 bg-[#c6c6cd]" />
+                <button
+                  onClick={handleSignOut}
+                  className="text-[11px] font-semibold tracking-widest uppercase text-[#45464d] hover:text-black transition-colors"
+                >
+                  Çıkış
+                </button>
+                <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-[11px] font-bold">
+                  {user.email?.[0].toUpperCase()}
+                </div>
+              </div>
+            ) : (
+              <Link href="/login" className="hover:opacity-80 transition-opacity">
+                <span className="material-symbols-outlined">person</span>
+              </Link>
+            )}
           </div>
         </div>
       </nav>
@@ -65,6 +96,9 @@ export default function Navbar() {
           </button>
           <Link href="/cart" className="text-[#0b1c30]">
             <span className="material-symbols-outlined">shopping_bag</span>
+          </Link>
+          <Link href={user ? '/admin' : '/login'} className="text-[#0b1c30]">
+            <span className="material-symbols-outlined">{user ? 'admin_panel_settings' : 'person'}</span>
           </Link>
         </div>
       </header>
@@ -84,10 +118,12 @@ export default function Navbar() {
             <span className="material-symbols-outlined mb-1">shopping_cart</span>
             <span className="text-[10px] font-sans font-semibold uppercase tracking-widest">Cart</span>
           </Link>
-          <button className="flex flex-col items-center justify-center text-slate-400 p-2 rounded-lg">
+          <Link href={user ? '/admin' : '/login'} className="flex flex-col items-center justify-center text-slate-400 p-2 rounded-lg">
             <span className="material-symbols-outlined mb-1">person</span>
-            <span className="text-[10px] font-sans font-semibold uppercase tracking-widest">Profile</span>
-          </button>
+            <span className="text-[10px] font-sans font-semibold uppercase tracking-widest">
+              {user ? 'Hesap' : 'Giriş'}
+            </span>
+          </Link>
         </div>
       </nav>
     </>
